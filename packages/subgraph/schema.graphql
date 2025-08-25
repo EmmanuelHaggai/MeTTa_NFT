@@ -1,0 +1,130 @@
+type Drop @entity {
+  id: ID!
+  tokenId: BigInt!
+  tokenType: TokenType!
+  price: BigInt!
+  maxSupply: BigInt!
+  totalSupply: BigInt!
+  maxPerWallet: BigInt!
+  startTime: BigInt!
+  endTime: BigInt!
+  metadataURI: String!
+  creator: User!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+  metadataFrozen: Boolean!
+  
+  # Relationships
+  mints: [Mint!]! @derivedFrom(field: "drop")
+  utilities: [Utility!]! @derivedFrom(field: "drop")
+}
+
+type Token @entity {
+  id: ID! # tokenId
+  tokenId: BigInt!
+  tokenType: TokenType!
+  drop: Drop!
+  currentSupply: BigInt!
+  
+  # Relationships
+  mints: [Mint!]! @derivedFrom(field: "token")
+  holders: [TokenHolder!]! @derivedFrom(field: "token")
+}
+
+type User @entity {
+  id: ID! # wallet address
+  address: Bytes!
+  totalMints: BigInt!
+  totalSpent: BigInt!
+  createdDrops: [Drop!]! @derivedFrom(field: "creator")
+  mints: [Mint!]! @derivedFrom(field: "minter")
+  personalizedMints: [PersonalizedMint!]! @derivedFrom(field: "minter")
+  utilityRedemptions: [UtilityRedemption!]! @derivedFrom(field: "user")
+  tokens: [TokenHolder!]! @derivedFrom(field: "holder")
+  
+  # Statistics
+  firstMintAt: BigInt
+  lastMintAt: BigInt
+  fanLevel: String # "Standard", "Premium", "VIP"
+}
+
+type Mint @entity {
+  id: ID! # txHash-logIndex
+  drop: Drop!
+  token: Token!
+  minter: User!
+  quantity: BigInt!
+  paid: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type PersonalizedMint @entity {
+  id: ID! # txHash-logIndex
+  collection: Bytes!
+  tokenId: BigInt!
+  minter: User!
+  quantity: BigInt!
+  finalPrice: BigInt!
+  nonce: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type Utility @entity {
+  id: ID! # utilityId
+  utilityId: BigInt!
+  drop: Drop!
+  name: String!
+  description: String!
+  active: Boolean!
+  createdAt: BigInt!
+  
+  # Relationships
+  redemptions: [UtilityRedemption!]! @derivedFrom(field: "utility")
+}
+
+type UtilityRedemption @entity {
+  id: ID! # txHash-logIndex
+  utility: Utility!
+  user: User!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type TokenHolder @entity {
+  id: ID! # tokenId-holderAddress
+  token: Token!
+  holder: User!
+  balance: BigInt!
+  firstMintAt: BigInt!
+  lastMintAt: BigInt!
+}
+
+type DailyStats @entity {
+  id: ID! # YYYY-MM-DD
+  date: String!
+  totalMints: BigInt!
+  totalVolume: BigInt!
+  uniqueMinters: BigInt!
+  newUsers: BigInt!
+}
+
+type GlobalStats @entity {
+  id: ID! # "global"
+  totalDrops: BigInt!
+  totalMints: BigInt!
+  totalVolume: BigInt!
+  totalUsers: BigInt!
+  totalUtilities: BigInt!
+  totalRedemptions: BigInt!
+  updatedAt: BigInt!
+}
+
+enum TokenType {
+  ERC1155
+  ERC721
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@se-2/subgraph",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "graph build",
+    "create-local": "graph create --node http://localhost:8020/ scaffold-eth/your-contract",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ scaffold-eth/your-contract",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scaffold-eth/your-contract",
+    "dev": "graph build && graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scaffold-eth/your-contract"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.54.0",
+    "@graphprotocol/graph-ts": "0.30.0"
+  }
+}
